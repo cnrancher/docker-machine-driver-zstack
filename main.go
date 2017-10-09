@@ -1,23 +1,10 @@
 package main
 
 import (
-	"os"
-
-	"github.com/Sirupsen/logrus"
-	"github.com/urfave/cli"
+	"github.com/docker/machine/libmachine/drivers/plugin"
+	"github.com/rancher/docker-machine-driver-zstack/zstack"
 )
 
-var VERSION = "v0.0.0-dev"
-
 func main() {
-	app := cli.NewApp()
-	app.Name = "docker-machine-driver-zstack"
-	app.Version = VERSION
-	app.Usage = "You need help!"
-	app.Action = func(c *cli.Context) error {
-		logrus.Info("I'm a turkey")
-		return nil
-	}
-
-	app.Run(os.Args)
+	plugin.RegisterDriver(zstack.NewDriver())
 }
