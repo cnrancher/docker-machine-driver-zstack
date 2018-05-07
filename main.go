@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/docker/machine/libmachine/drivers/plugin"
-	"github.com/rancher/docker-machine-driver-zstack/zstack"
+	"github.com/orangedeng/docker-machine-driver-zstack/zstack"
 )
 
 func main() {
-	plugin.RegisterDriver(zstack.NewDriver())
+	plugin.RegisterDriver(zstack.NewDriver("",""))
 }
