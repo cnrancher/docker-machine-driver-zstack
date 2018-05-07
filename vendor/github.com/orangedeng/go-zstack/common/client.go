@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"log"
+	"crypto/tls"
 
 	"github.com/pkg/errors"
 )
@@ -27,7 +29,10 @@ func (client *Client) Init(AccountName, Password, ServerEndpoint string) error {
 	client.accountName = AccountName
 	client.password = fmt.Sprintf("%x", hsha512.Sum(nil))
 	client.serverEndpoint = ServerEndpoint
-	client.httpClient = &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client.httpClient = &http.Client{Transport: tr}
 	return client.login()
 }
 
@@ -53,16 +58,27 @@ func (client *Client) login() error {
 		return errors.Wrap(err, "Get error while getting data from login response")
 	}
 
+	var prettyJSON bytes.Buffer
+	err = json.Indent(&prettyJSON, respBody, "", "    ")
+	log.Println(string(prettyJSON.Bytes()))
+
 	loginResponse := LoginResponse{}
-	if err := json.Unmarshal(respBody, &loginResponse); err != nil {
-		return errors.Wrap(err, "Get error while decoding login response")
-	}
+	errorResponse := ErrorResponse{}
+
 	if int(resp.StatusCode/100) != 2 {
-		return fmt.Errorf("return status: %d,not equal to 2xx", resp.StatusCode)
+		if err := json.Unmarshal(respBody, &errorResponse); err != nil {
+			return errors.Wrap(err, "Get error while decoding login response")
+		}
+		return errors.New(errorResponse.Error.Description + " " + errorResponse.Error.Details)
+	} else {
+		if err := json.Unmarshal(respBody, &loginResponse); err != nil {
+			return errors.Wrap(err, "Get error while decoding login response")
+		}
 	}
-	if loginResponse.Error != nil {
-		return errors.New(loginResponse.Error.Description + " " + loginResponse.Error.Details)
-	}
+
+	//if loginResponse.Error != nil {
+	//	return errors.New(loginResponse.Error.Description + " " + loginResponse.Error.Details)
+	//}
 
 	client.sessionID = loginResponse.Inventory.UUID
 	return nil

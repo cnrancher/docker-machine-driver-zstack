@@ -3,18 +3,26 @@ package instance
 import "github.com/orangedeng/go-zstack/common"
 
 const (
-	createInstanceURI  = "/v1/vm-instances"
-	deleteInstanceURI  = "/v1/vm-instances/{uuid}"
-	operateInstanceURI = "/v1/vm-instances/{uuid}/actions"
-	queryInstanceURI   = "/v1/vm-instances/{uuid}"
-	queryInstancesURI  = "/v1/vm-instances"
+	createInstanceURI  = "/zstack/v1/vm-instances"
+	deleteInstanceURI  = "/zstack/v1/vm-instances/{uuid}"
+	operateInstanceURI = "/zstack/v1/vm-instances/{uuid}/actions"
+	queryInstanceURI   = "/zstack/v1/vm-instances/{uuid}"
+	queryInstancesURI  = "/zstack/v1/vm-instances"
 	//StopInstanceTypeGrace stop instance gracefully
 	StopInstanceTypeGrace StopInstanceType = "grace"
 	//StopInstanceTypeCold stop instance immediately, equal to power off.
 	StopInstanceTypeCold StopInstanceType = "cold"
 )
 
+const (
+	InstanceDefaultTimeout = 120
+	DefaultWaitForInterval = 5
+	timeout				   = 300
+)
+
 type StopInstanceType string
+
+type VmInstanceStatus string
 
 type CreateRequest struct {
 	Params struct {
@@ -35,6 +43,13 @@ type CreateRequest struct {
 		Strategy                        string   `json:"strategy,omitempty"`
 	} `json:"params,omitempty"`
 	common.Tags `json:",inline"`
+}
+
+type CreateOfferingRequest struct {
+	Params struct {
+		CpuNum     int 		`json:"cpuNum,omitempty"`
+		MemorySize int64    `json:"memorySize,omitempty"`
+	}
 }
 
 type Response struct {
@@ -115,7 +130,7 @@ type QueryInstanceResponse struct {
 }
 
 type StartInstanceRequest struct {
-	StartVMInstance map[string]string `json:"startVmInstance,omitempty"`
+	StartVMInstance map[string]string `json:"startVmInstance"`
 	common.Tags     `json:",inline"`
 }
 

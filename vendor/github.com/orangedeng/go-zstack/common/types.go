@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	loginURI                = "/v1/accounts/login"
-	logoutURI               = "/v1/accounts/sessions/{uuid}"
+	loginURI                = "/zstack/v1/accounts/login"
+	logoutURI               = "/zstack/v1/accounts/sessions/{uuid}"
 	defaultQueryAsyncPeriod = 1 * time.Second
 )
 
@@ -35,14 +35,17 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Error     *Error `json:"error,omitempty"`
 	Inventory struct {
 		UUID        string `json:"uuid,omitempty"`
 		AccountUUID string `json:"accountUuid,omitempty"`
 		UserUUID    string `json:"userUuid,omitempty"`
 		ExpiredDate string `json:"expiredDate,omitempty"`
 		CreateDate  string `json:"createDate,omitempty"`
-	}
+	} `json:"inventory,omitempty"`
+}
+
+type ErrorResponse struct {
+	Error	Error `json:"error,omitempty"`
 }
 
 type ZStack503Error struct {
@@ -126,6 +129,9 @@ func (async *AsyncResponse) QueryRealResponse(i interface{}, timeout time.Durati
 					return err
 				}
 				logrus.Info(string(responseBody))
+				if string(responseBody) == "" {
+					return nil
+				}
 				return json.Unmarshal(responseBody, i)
 			case 404:
 				//Location is no longer available
