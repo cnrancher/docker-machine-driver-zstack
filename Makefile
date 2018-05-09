@@ -2,7 +2,6 @@ TARGETS := $(shell ls scripts)
 
 .dapper:
 	@echo Downloading dapper
-	@echo test 
 	@curl -sL http://dev-tool.oss-cn-shenzhen.aliyuncs.com/dapper-`uname -s`-`uname -m`/dapper  > .dapper.tmp
 	@@chmod +x .dapper.tmp
 	@./.dapper.tmp -v

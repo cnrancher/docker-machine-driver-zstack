@@ -6,5 +6,18 @@ source $(dirname $0)/version
 cd $(dirname $0)/..
 
 mkdir -p bin
-[ "$(uname)" != "Darwin" ] && LINKFLAGS="-linkmode external -extldflags -static -s"
-CGO_ENABLED=0 go build -ldflags "-X main.VERSION=$VERSION $LINKFLAGS" -o bin/docker-machine-driver-zstack
+
+OS_PLATFORM_ARG=(linux darwin)
+OS_ARCH_ARG[linux]="amd64"
+
+rm -rf bin/*
+for OS in ${OS_PLATFORM_ARG[@]}; do
+    for ARCH in ${OS_ARCH_ARG[${OS}]}; do
+        OUTPUT_BIN="bin/$OS/$ARCH/docker-machine-driver-zstack"
+        if [ "$OS" == "windows" ]; then
+            OUTPUT_BIN="$OUTPUT_BIN.exe"
+        fi
+        echo "Building binary for $OS/$ARCH..."
+        GOARCH=$ARCH GOOS=$OS CGO_ENABLED=0 go build -o "$OUTPUT_BIN"
+    done
+done

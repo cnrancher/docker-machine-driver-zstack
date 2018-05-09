@@ -3,16 +3,17 @@ set -e
 
 source $(dirname $0)/version
 
-ARCH=${ARCH:?"ARCH not set"}
-SUFFIX=""
-[ "${ARCH}" != "amd64" ] && SUFFIX="_${ARCH}"
+cd $(dirname $0)/..
 
-cd $(dirname $0)/../package
+mkdir -p dist
+rm -rf dist/*
 
-TAG=${TAG:-${VERSION}${SUFFIX}}
-REPO=${REPO:-rancher}
-
-cp ../bin/docker-machine-driver-zstack .
-docker build -t ${REPO}/docker-machine-driver-zstack:${TAG} .
-
-echo Built ${REPO}/docker-machine-driver-zstack:${TAG}
+for os in $(ls bin); do
+  for arch in $(ls bin/$os); do
+    pushd bin/$os/$arch
+    tar -czf "docker-machine-driver-zstack.tgz" ./docker-machine-driver-zstack*
+    popd
+    mkdir -p dist/$os/$arch
+    mv bin/$os/$arch/docker-machine-driver-zstack.tgz dist/$os/$arch/docker-machine-driver-zstack.tgz
+  done
+done

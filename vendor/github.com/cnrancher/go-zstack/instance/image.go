@@ -1,6 +1,6 @@
 package instance
 
-import "github.com/orangedeng/go-zstack/common"
+import "github.com/cnrancher/go-zstack/common"
 
 type Image struct {
 	common.Client

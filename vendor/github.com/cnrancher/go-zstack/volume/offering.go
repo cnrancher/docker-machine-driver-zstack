@@ -1,7 +1,7 @@
 package volume
 
 import (
-	"github.com/orangedeng/go-zstack/common"
+	"github.com/cnrancher/go-zstack/common"
 )
 
 type Offering struct {
