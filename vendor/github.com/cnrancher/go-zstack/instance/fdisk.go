@@ -40,6 +40,7 @@ main()
   echo "\${DISK_ATTACH_POINT}1   \${MOUNT_PATH}  ext4    defaults        0 0" >>/etc/fstab
   mount -a
   mount --make-shared \${MOUNT_PATH}
+  mount --make-shared /
   mkdir -p \${MOUNT_PATH}\${DOCKER_DIR_PATH}
   #mkdir -p \${MOUNT_PATH}\${KUBELET_DIR_PATH}
 
